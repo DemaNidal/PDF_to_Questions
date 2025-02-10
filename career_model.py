@@ -8,7 +8,7 @@ load_dotenv()
 class CareerPathRecommender:
     def __init__(self):
         # Retrieve the API key from environment variables
-        api_key = os.getenv('TOGETHER_AI_API_KEY')
+         api_key = "bd2ae31907396fd2d709ec34801487378c7285a728db8780c29029fda00709f0"
         if not api_key:
             raise ValueError("API key must be set in the environment variables or .env file.")
 
