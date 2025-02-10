@@ -1,7 +1,7 @@
 import os
 import streamlit as st
 from dotenv import load_dotenv
-from resume_parser import parse_resume
+from resume_parser import extract_sentences_from_pdf
 from career_model import CareerPathRecommender
 
 # Load environment variables
