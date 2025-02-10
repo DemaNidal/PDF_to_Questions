@@ -19,7 +19,7 @@ if uploaded_file:
     try:
         # Parse the resume
         st.write("Parsing the resume...")
-        resume_data = parse_resume(uploaded_file)
+        resume_data = extract_sentences_from_pdf(uploaded_file)
         st.success("Resume parsed successfully!")
         
         # Initialize the recommender
