@@ -51,5 +51,3 @@ def parse_resume(pdf_path):
                     resume_data["education"].extend(education)
 
     return resume_data
-
-
