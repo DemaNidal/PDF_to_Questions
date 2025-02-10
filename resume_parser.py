@@ -1,53 +1,60 @@
 import pdfplumber
 import re
+import random
 
-def parse_resume(pdf_path):
-    """Parse the resume PDF to extract relevant information.
-
-    Args:
-        pdf_path (str): The path to the PDF resume.
-
-    Returns:
-        dict: A dictionary containing extracted information.
-    """
-    resume_data = {
-        "name": None,
-        "email": None,
-        "phone": None,
-        "skills": [],
-        "education": [],
-    }
-
+def extract_sentences_from_pdf(pdf_path):
+    """Extract sentences from a PDF file."""
+    text_data = []
+    
     with pdfplumber.open(pdf_path) as pdf:
-        # Iterate through each page of the PDF
         for page in pdf.pages:
             text = page.extract_text()
-
             if text:
-                # Extract name (assumed to be the first line)
-                if resume_data["name"] is None:
-                    resume_data["name"] = text.split('\n')[0]
+                sentences = re.split(r'(?<=[.!?])\s+', text)  # Split text into sentences
+                text_data.extend(sentences)
+    
+    return text_data
 
-                # Extract email using regex
-                email_match = re.search(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', text)
-                if email_match:
-                    resume_data["email"] = email_match.group(0)
+def generate_questions(sentences):
+    """Generate 10 questions from extracted sentences."""
+    questions = []
+    
+    for sentence in sentences:
+        words = sentence.split()
+        if len(words) > 5:  # Only consider meaningful sentences
+            question_type = random.choice(["what", "why", "how", "explain", "list"])
+            
+            if question_type == "what":
+                question = f"What is {words[0]}?"
+            elif question_type == "why":
+                question = f"Why is {words[1]} important?"
+            elif question_type == "how":
+                question = f"How does {words[0]} work?"
+            elif question_type == "explain":
+                question = f"Explain {words[0]} in detail."
+            elif question_type == "list":
+                question = f"List the key points about {words[0]}."
+            
+            questions.append(question)
 
-                # Extract phone number using regex (example pattern, can be adjusted)
-                phone_match = re.search(r'\(?\b[0-9]{3}[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}\b', text)
-                if phone_match:
-                    resume_data["phone"] = phone_match.group(0)
+            if len(questions) >= 10:  # Stop after 10 questions
+                break
 
-                # Extract skills (assumes skills are listed under a "Skills" section)
-                if "skills" in text.lower():
-                    skills_section = text.lower().split("skills")[-1]
-                    skills = re.findall(r'\b\w+\b', skills_section)
-                    resume_data["skills"].extend(skills)
+    return questions
 
-                # Extract education (assumes education is listed under an "Education" section)
-                if "education" in text.lower():
-                    education_section = text.lower().split("education")[-1]
-                    education = re.findall(r'\b\w+\b', education_section)
-                    resume_data["education"].extend(education)
+def extract_questions_from_pdf(pdf_path):
+    """Main function to extract and generate questions from a PDF."""
+    sentences = extract_sentences_from_pdf(pdf_path)
+    
+    if not sentences:
+        return ["No text found in PDF."]
+    
+    questions = generate_questions(sentences)
+    
+    return questions if questions else ["Could not generate questions."]
 
-    return resume_data
+# Example usage (uncomment to test)
+# pdf_path = "sample.pdf"  # Replace with actual PDF file path
+# questions = extract_questions_from_pdf(pdf_path)
+# for q in questions:
+#     print(q)
